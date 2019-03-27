@@ -58,14 +58,25 @@ public void OnClientCookiesCached(int client) {
     g_TRifleChoice[client] = trifle;
     g_AwpChoice[client] = GetCookieBool(client, g_hAwpChoiceCookie);
 }
-
-static void SetNades(char nades[NADE_STRING_LENGTH]) {
+static void SetNadesT(char nades[NADE_STRING_LENGTH]) {
     int rand = GetRandomInt(0, 3);
     switch(rand) {
-        case 0: nades = "";
+        case 0: nades = "m";
         case 1: nades = "s";
         case 2: nades = "f";
         case 3: nades = "h";
+    }
+}
+static void SetNadesCT(char nades[NADE_STRING_LENGTH]) {
+    int rand = GetRandomInt(0, 6);
+    switch(rand) {
+        case 0: nades = "i";
+        case 1: nades = "sf";
+        case 2: nades = "fs";
+        case 3: nades = "hs";
+        case 4: nades = "hf";
+        case 5: nades = "ff";
+        case 6: nades = "sf";
     }
 }
 
@@ -87,46 +98,57 @@ public void WeaponAllocator(ArrayList tPlayers, ArrayList ctPlayers, Bombsite bo
     for (int i = 0; i < tCount; i++) {
         int client = GetArrayCell(tPlayers, i);
 
+        kevlar = 0;
+        helmet = false;
+
         if (giveTAwp && g_AwpChoice[client]) {
             primary = "weapon_awp";
             giveTAwp = false;
         } else if(StrEqual(g_TRifleChoice[client], "sg556", true)) {
             primary = "weapon_sg556";
+            kevlar = 100;
+        } else if(StrEqual(g_TRifleChoice[client], "galil", true)) {
+            primary = "weapon_galilar";
+            kevlar = 100;
+            helmet = true;
         } else {
             primary = "weapon_ak47";
+            kevlar = 100;
         }
-
-        secondary = "weapon_glock";
+        secondary = "weapon_p250";
         health = 100;
-        kevlar = 100;
-        helmet = true;
         kit = false;
-        SetNades(nades);
-
+        SetNadesT(nades);
         Retakes_SetPlayerInfo(client, primary, secondary, nades, health, kevlar, helmet, kit);
     }
 
     for (int i = 0; i < ctCount; i++) {
         int client = GetArrayCell(ctPlayers, i);
 
+        kevlar = 0;
+        helmet = false;
+
         if (giveCTAwp && g_AwpChoice[client]) {
             primary = "weapon_awp";
             giveCTAwp = false;
         } else if (StrEqual(g_CTRifleChoice[client], "m4a1_silencer", true)) {
             primary = "weapon_m4a1_silencer";
+            kevlar = 100;
         } else if (StrEqual(g_CTRifleChoice[client], "m4a1", true)) {
             primary = "weapon_m4a1";
+            kevlar = 100;
+        } else if (StrEqual(g_CTRifleChoice[client], "famas", true)) {
+            primary = "weapon_famas";
+            kevlar = 100;
+            helmet = true;
         } else {
             primary = "weapon_aug";
+            kevlar = 100;
         }
-
-        secondary = "weapon_hkp2000";
+        secondary = "weapon_p250";
         kit = true;
         health = 100;
-        kevlar = 100;
-        helmet = true;
-        SetNades(nades);
-
+        SetNadesCT(nades);
         Retakes_SetPlayerInfo(client, primary, secondary, nades, health, kevlar, helmet, kit);
     }
 }
@@ -136,6 +158,7 @@ public void GiveWeaponsMenu(int client) {
     SetMenuTitle(menu, "Select a CT rifle:");
     AddMenuItem(menu, "m4a1", "M4A4");
     AddMenuItem(menu, "m4a1_silencer", "M4A1-S");
+    AddMenuItem(menu, "famas", "FAMAS");
     AddMenuItem(menu, "aug", "AUG");
     DisplayMenu(menu, client, MENU_TIME_LENGTH);
 }
@@ -158,6 +181,7 @@ public void TRifleMenu(int client) {
     SetMenuTitle(menu, "Select a T rifle:");
     AddMenuItem(menu, "ak47", "AK-47");
     AddMenuItem(menu, "sg556", "SG-556");
+    AddMenuItem(menu, "galilar", "Galil");
     DisplayMenu(menu, client, MENU_TIME_LENGTH);
 }
 
